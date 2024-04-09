@@ -12,13 +12,13 @@ class PerceptronModel(object):
         """
         self.w = nn.Parameter(1, dimensions)
 
-    def get_weights(self):
+    def get_weights(self): # Returns nn.Parameter object
         """
         Return a Parameter instance with the current weights of the perceptron.
         """
         return self.w
 
-    def run(self, x):
+    def run(self, x): # Input x is a nn.Constant object
         """
         Calculates the score assigned by the perceptron to a data point x.
 
@@ -27,20 +27,33 @@ class PerceptronModel(object):
         Returns: a node containing a single number (the score)
         """
         "*** YOUR CODE HERE ***"
+        weights = self.get_weights()
+        return nn.DotProduct(weights, x)
 
-    def get_prediction(self, x):
+    def get_prediction(self, x): # Input x is a nn.Constant object
         """
         Calculates the predicted class for a single data point `x`.
 
         Returns: 1 or -1
         """
         "*** YOUR CODE HERE ***"
+        #print("\n", nn.as_scalar(PerceptronModel.run(self, x)), "\n")
+        return 1 if nn.as_scalar(self.run(x)) >= 0 else -1
 
     def train(self, dataset):
         """
         Train the perceptron until convergence.
         """
         "*** YOUR CODE HERE ***"
+        parameters = self.get_weights()
+        convergence = False
+        while not convergence:
+            convergence = True
+            for x, y in dataset.iterate_once(1): # x is input data, y is the correct label
+                if self.get_prediction(x) != nn.as_scalar(y):
+                    parameters.update(direction=nn.Constant(y.data * x.data), multiplier=1)
+                    convergence = False
+        
 
 class RegressionModel(object):
     """
